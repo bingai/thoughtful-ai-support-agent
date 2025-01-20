@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
 from utils.response_retriever import load_responses, get_response
 from groq import Groq
+from dotenv import load_dotenv
+load_dotenv()
 
-GROQ_API_KEY="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"
-client = Groq(
-    api_key=GROQ_API_KEY,
-)
+client = Groq()
 
 app = Flask(__name__)
 responses = load_responses('src/data/predefined_responses.json')
