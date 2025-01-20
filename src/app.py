@@ -1,5 +1,11 @@
 from flask import Flask, request, jsonify
 from utils.response_retriever import load_responses, get_response
+from groq import Groq
+
+GROQ_API_KEY="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"
+client = Groq(
+    api_key=GROQ_API_KEY,
+)
 
 app = Flask(__name__)
 responses = load_responses('src/data/predefined_responses.json')
@@ -8,7 +14,23 @@ responses = load_responses('src/data/predefined_responses.json')
 def ask():
     user_question = request.json.get('question')
     answer = get_response(user_question, responses)
+    if not answer:
+        answer = get_generic_response(user_question)
     return jsonify({'answer': answer})
+
+def get_generic_response(question):
+    chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": question,
+        }
+    ],
+    model="llama-3.3-70b-versatile",
+)
+
+    return chat_completion.choices[0].message.content
 
 if __name__ == "__main__":
     app.run(debug=True)
+
